@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 public class Main {
     public static void main(String[] args) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Connection conn = null;
         PreparedStatement st = null;
 
@@ -15,33 +14,18 @@ public class Main {
             conn = DB.getConnection();
 
             st = conn.prepareStatement(
-                    "INSERT INTO seller "
-                    + "(Name,Email,BirthDate,BaseSalary, DepartmentId)"
-                    + "VALUES "
-                    + "(?, ?, ?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS);
-            st.setString(1,"José Augusto");
-            st.setString(2,"jose@gmail.com");
-            st.setDate(3,new java.sql.Date(sdf.parse("05/11/1995").getTime()));
-            st.setDouble(4,3000.0);
-            st.setInt(5,3);
+                    "UPDATE seller "
+                    + "SET BaseSalary = BaseSalary + ? "
+                    + "WHERE "
+                    + "(DepartmentId = ?)");
 
-           int rowsAffected = st.executeUpdate();
+            st.setDouble(1,200.0);
+            st.setInt(2,2);
 
-           if (rowsAffected >0){
-               ResultSet rs = st.getGeneratedKeys();
-               while (rs.next()){
-                   int id = rs.getInt(1);
-                   System.out.println("Done! id = " + id);
-               }
-           }
-           else {
-               System.out.println("No rown affected!");
-           }
+            int rowsAffected = st.executeUpdate();
+            System.out.println("Done! Rows affected: " + rowsAffected);
 
         }catch (SQLException e){
-            e.printStackTrace();
-        }catch (ParseException e){
             e.printStackTrace();
         }finally {
             DB.closeStatement(st);
